@@ -4,5 +4,6 @@
         <file>resource/image/disconnect.png</file>
         <file>resource/image/mainicon.png</file>
         <file>resource/image/plugin.png</file>
+        <file>resource/image/send.png</file>
     </qresource>
 </RCC>
