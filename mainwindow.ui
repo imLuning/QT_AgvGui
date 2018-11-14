@@ -7,8 +7,26 @@
     <x>0</x>
     <y>0</y>
     <width>351</width>
-    <height>322</height>
+    <height>325</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>351</width>
+    <height>325</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>351</width>
+    <height>325</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>AGV</string>
@@ -131,6 +149,7 @@
    <addaction name="actConnect"/>
    <addaction name="actDisconnect"/>
    <addaction name="actSend"/>
+   <addaction name="actQuit"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actConnect">
@@ -167,6 +186,18 @@
    </property>
    <property name="toolTip">
     <string>发送</string>
+   </property>
+  </action>
+  <action name="actQuit">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/image/resource/image/quit.png</normaloff>:/image/resource/image/quit.png</iconset>
+   </property>
+   <property name="text">
+    <string>退出</string>
+   </property>
+   <property name="toolTip">
+    <string>退出</string>
    </property>
   </action>
  </widget>
