@@ -1,4 +1,4 @@
-﻿#if _MSC_VER >= 1400
+﻿  #if _MSC_VER >= 1400
 #pragma execution_character_set("utf-8")
 #endif
 
@@ -17,6 +17,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QString localIP = getLocalIP();
     this->setWindowTitle(this->windowTitle()+" Local IP "+localIP);
     ui->lineEditTarAddr->setText(localIP);
+    ui->spinBoxTarPort->setValue(8888);
+
+    connect(tcpClient,SIGNAL(connected()),this,SLOT(onConnected()));
+    connect(tcpClient,SIGNAL(disconnected()),this,SLOT(onDisconnected()));
+    connect(tcpClient,SIGNAL(stateChanged(QAbstractSocket::SocketState)),this,SLOT(onSocketStateChange(QAbstractSocket::SocketState)));
+    connect(tcpClient,SIGNAL(readyRead()),this,SLOT(onSocketReadyRead()));
 }
 
 MainWindow::~MainWindow()
@@ -44,4 +50,95 @@ QString MainWindow::getLocalIP()
         }
     }
     return localIP;
+}
+
+void MainWindow::onConnected()
+{
+    ui->plainTextEditLocalHistory->appendPlainText("->已连接到服务器");
+    //ui->plainTextEditLocalHistory->appendPlainText("->peer name: "+tcpClient->peerName());
+    ui->plainTextEditLocalHistory->appendPlainText("->peer address: "+tcpClient->peerAddress().toString());
+    ui->plainTextEditLocalHistory->appendPlainText("->peer port: "+QString::number(tcpClient->peerPort()));
+    //qDebug()<<tcpClient->peerPort();
+
+    ui->actConnect->setEnabled(false);
+    ui->actDisconnect->setEnabled(true);
+}
+
+void MainWindow::onDisconnected()
+{
+    ui->plainTextEditLocalHistory->appendPlainText("->已与服务器断开连接");
+
+    ui->actConnect->setEnabled(true);
+    ui->actDisconnect->setEnabled(false);
+}
+
+void MainWindow::onSocketStateChange(QAbstractSocket::SocketState socketState)
+{
+    switch(socketState)
+    {
+        case QAbstractSocket::UnconnectedState:
+            {labSocketState->setText("socket状态：UnconnectedState");break;}
+        case QAbstractSocket::HostLookupState:
+            {labSocketState->setText("socket状态：HostLookupState");break;}
+        case QAbstractSocket::ConnectingState:
+            {labSocketState->setText("socket状态：ConnectingState");break;}
+        case QAbstractSocket::ConnectedState:
+            {labSocketState->setText("socket状态：ConnectedState");break;}
+        case QAbstractSocket::BoundState:
+            {labSocketState->setText("socket状态：BoundState");break;}
+        case QAbstractSocket::ClosingState:
+            {labSocketState->setText("socket状态：ClosingState");break;}
+        case QAbstractSocket::ListeningState:
+            {labSocketState->setText("socket状态：ListeningState");break;}
+    }
+}
+
+void MainWindow::onSocketReadyRead()
+{
+    while(tcpClient->canReadLine())
+    {
+        ui->plainTextEditLocalHistory->appendPlainText("[in]"+tcpClient->readLine());
+    }
+}
+
+void MainWindow::on_actConnect_triggered()
+{
+    QString addr = ui->lineEditTarAddr->text();
+    quint16 port = ui->spinBoxTarPort->value();
+    tcpClient->connectToHost(addr,port);
+}
+
+
+void MainWindow::on_actDisconnect_triggered()
+{
+    if(tcpClient->state() == QAbstractSocket::ConnectedState)
+    {
+        tcpClient->disconnectFromHost();
+    }
+
+//    tcpClient->deleteLater();
+}
+
+void MainWindow::on_actSend_triggered()
+{
+    QString msg = ui->lineEditCommand->text();
+    ui->plainTextEditLocalHistory->appendPlainText("[out]"+msg);
+    //ui->lineEditMsg->clear();
+    ui->lineEditCommand->setFocus();
+
+    QByteArray str = msg.toUtf8();
+    str.append('\n');
+    tcpClient->write(str);
+}
+
+void MainWindow::on_actQuit_triggered()
+{
+    if(tcpClient->state() == QAbstractSocket::ConnectedState)
+    {
+        tcpClient->disconnectFromHost();
+    }
+
+    tcpClient->deleteLater();
+
+    QApplication::exit();
 }

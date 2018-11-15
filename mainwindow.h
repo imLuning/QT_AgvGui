@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QHostInfo>
 #include <QHostAddress>
+#include <QDebug>
 
 namespace Ui {
 class MainWindow;
@@ -24,6 +25,16 @@ private:
     QTcpSocket *tcpClient;
     QLabel *labSocketState;
     QString getLocalIP();
+
+private slots:
+    void onConnected();
+    void onDisconnected();
+    void onSocketStateChange(QAbstractSocket::SocketState socketState);
+    void onSocketReadyRead();
+    void on_actConnect_triggered();
+    void on_actDisconnect_triggered();
+    void on_actSend_triggered();
+    void on_actQuit_triggered();
 };
 
 #endif // MAINWINDOW_H
