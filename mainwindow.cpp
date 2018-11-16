@@ -11,14 +11,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    tcpClient = new QTcpSocket(this);
-    labSocketState  = new QLabel("socket状态：");
+    tcpClient = new QTcpSocket(this);   //创建socket
+    labSocketState  = new QLabel("socket状态：");  //添加状态栏信息
     labSocketState->setMinimumWidth(300);
     ui->statusBar->addWidget(labSocketState);
-    QString localIP = getLocalIP();
-    this->setWindowTitle(this->windowTitle()+" Local IP "+localIP);
-    ui->lineEditTarAddr->setText(localIP);
-    ui->spinBoxTarPort->setValue(8888);
+    QString localIP = getLocalIP(); //获取本地IP
+    this->setWindowTitle(this->windowTitle()+" Local IP "+localIP); //标题栏显示IP
+    ui->lineEditTarAddr->setText(localIP);  //初始化地址栏
+    ui->spinBoxTarPort->setValue(8888);   //初始化端口
+
+    ui->comboBoxCommand->addItem("手动",0);
+    ui->comboBoxCommand->addItem("自动",1);
+    ui->comboBoxCommand->addItem("定点",2);
 
     connect(tcpClient,SIGNAL(connected()),this,SLOT(onConnected()));
     connect(tcpClient,SIGNAL(disconnected()),this,SLOT(onDisconnected()));
@@ -145,4 +149,40 @@ void MainWindow::on_actQuit_triggered()
     tcpClient->deleteLater();
 
     QApplication::exit();
+}
+
+void MainWindow::on_btnSetCommand_clicked()
+{
+    uint16_t crc16;
+    QByteArray command;
+    command.resize(8);
+    command[0] = 0x55;
+    command[1] = 0x55;
+    command[2] = 0x03;
+    command[3] = 0x02;
+    switch (ui->comboBoxCommand->currentData().toInt())
+    {
+        case 0: //手动模式
+            command[4] = 0x10;
+            ui->lineEditCommand->setText(command.toHex().toUpper());
+            break;
+        case 1: //自动模式
+            command[4] = 0x11;
+            command[5] = ui->spinBoxCountOrPoint->value();
+            crc16 = GetCRC16(command,6);
+            command[6] = crc16;
+            command[7] = crc16>>8;
+            ui->lineEditCommand->setText(command.toHex().toUpper());
+            break;
+        case 2: //定点模式
+            command[4] = 0x12;
+            command[5] = ui->spinBoxCountOrPoint->value();
+            crc16 = GetCRC16(command,6);
+            command[6] = crc16;
+            command[7] = crc16>>8;
+            ui->lineEditCommand->setText(command.toHex().toUpper());
+            break;
+        default:
+            break;
+    }
 }

@@ -27,11 +27,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    stringtohex.cpp
+    stringtohex.cpp \
+    getcrc16.cpp
 
 HEADERS += \
         mainwindow.h \
-    stringtohex.h
+    stringtohex.h \
+    getcrc16.h
 
 FORMS += \
         mainwindow.ui

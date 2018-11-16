@@ -8,6 +8,7 @@
 #include <QHostAddress>
 #include <QDebug>
 #include "stringtohex.h"
+#include "getcrc16.h"
 
 namespace Ui {
 class MainWindow;
@@ -36,6 +37,7 @@ private slots:
     void on_actDisconnect_triggered();
     void on_actSend_triggered();
     void on_actQuit_triggered();
+    void on_btnSetCommand_clicked();
 };
 
 #endif // MAINWINDOW_H
