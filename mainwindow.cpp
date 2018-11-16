@@ -23,6 +23,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->comboBoxCommand->addItem("手动",0);
     ui->comboBoxCommand->addItem("自动",1);
     ui->comboBoxCommand->addItem("定点",2);
+    ui->comboBoxDirection->addItem("前",2);
+    ui->comboBoxDirection->addItem("后",7);
+    ui->comboBoxDirection->addItem("左",4);
+    ui->comboBoxDirection->addItem("右",5);
 
     connect(tcpClient,SIGNAL(connected()),this,SLOT(onConnected()));
     connect(tcpClient,SIGNAL(disconnected()),this,SLOT(onDisconnected()));
@@ -82,19 +86,19 @@ void MainWindow::onSocketStateChange(QAbstractSocket::SocketState socketState)
     switch(socketState)
     {
         case QAbstractSocket::UnconnectedState:
-            {labSocketState->setText("socket状态：UnconnectedState");break;}
+            {labSocketState->setText("socket state：UnconnectedState");break;}
         case QAbstractSocket::HostLookupState:
-            {labSocketState->setText("socket状态：HostLookupState");break;}
+            {labSocketState->setText("socket state：HostLookupState");break;}
         case QAbstractSocket::ConnectingState:
-            {labSocketState->setText("socket状态：ConnectingState");break;}
+            {labSocketState->setText("socket state：ConnectingState");break;}
         case QAbstractSocket::ConnectedState:
-            {labSocketState->setText("socket状态：ConnectedState");break;}
+            {labSocketState->setText("socket state：ConnectedState");break;}
         case QAbstractSocket::BoundState:
-            {labSocketState->setText("socket状态：BoundState");break;}
+            {labSocketState->setText("socket state：BoundState");break;}
         case QAbstractSocket::ClosingState:
-            {labSocketState->setText("socket状态：ClosingState");break;}
+            {labSocketState->setText("socket state：ClosingState");break;}
         case QAbstractSocket::ListeningState:
-            {labSocketState->setText("socket状态：ListeningState");break;}
+            {labSocketState->setText("socket state：ListeningState");break;}
     }
 }
 
@@ -164,6 +168,10 @@ void MainWindow::on_btnSetCommand_clicked()
     {
         case 0: //手动模式
             command[4] = 0x10;
+            command[5] = ui->comboBoxDirection->currentData().toInt();
+            crc16 = GetCRC16(command,6);
+            command[6] = crc16;
+            command[7] = crc16>>8;
             ui->lineEditCommand->setText(command.toHex().toUpper());
             break;
         case 1: //自动模式
