@@ -7,6 +7,7 @@
 #include <QHostInfo>
 #include <QHostAddress>
 #include <QDebug>
+#include "stringtohex.h"
 
 namespace Ui {
 class MainWindow;

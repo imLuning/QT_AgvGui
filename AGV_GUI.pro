@@ -26,10 +26,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    stringtohex.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    stringtohex.h
 
 FORMS += \
         mainwindow.ui

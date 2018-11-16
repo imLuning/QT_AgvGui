@@ -1,9 +1,10 @@
-﻿  #if _MSC_VER >= 1400
+﻿#if _MSC_VER >= 1400
 #pragma execution_character_set("utf-8")
 #endif
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "stringtohex.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -108,27 +109,27 @@ void MainWindow::on_actConnect_triggered()
     tcpClient->connectToHost(addr,port);
 }
 
-
 void MainWindow::on_actDisconnect_triggered()
 {
     if(tcpClient->state() == QAbstractSocket::ConnectedState)
     {
         tcpClient->disconnectFromHost();
     }
-
-//    tcpClient->deleteLater();
 }
 
 void MainWindow::on_actSend_triggered()
 {
     QString msg = ui->lineEditCommand->text();
+    QByteArray msgToSend;
+
+    ConvertStringToHex(msg,msgToSend);
     ui->plainTextEditLocalHistory->appendPlainText("[out]"+msg);
     //ui->lineEditMsg->clear();
     ui->lineEditCommand->setFocus();
+    ui->plainTextEditLocalHistory->appendPlainText("[out]"+msgToSend);
 
-    QByteArray str = msg.toUtf8();
-    str.append('\n');
-    tcpClient->write(str);
+
+    tcpClient->write(msgToSend);
 }
 
 void MainWindow::on_actQuit_triggered()
