@@ -55,10 +55,10 @@ QString MainWindow::getLocalIP()
 
 void MainWindow::onConnected()
 {
-    ui->plainTextEditLocalHistory->appendPlainText("->已连接到服务器");
+    ui->plainTextEditLocalHistory->appendPlainText("[Message]已连接到服务器");
     //ui->plainTextEditLocalHistory->appendPlainText("->peer name: "+tcpClient->peerName());
-    ui->plainTextEditLocalHistory->appendPlainText("->peer address: "+tcpClient->peerAddress().toString());
-    ui->plainTextEditLocalHistory->appendPlainText("->peer port: "+QString::number(tcpClient->peerPort()));
+    ui->plainTextEditLocalHistory->appendPlainText("[Message]"+tcpClient->peerAddress().toString());
+    ui->plainTextEditLocalHistory->appendPlainText("[Message]"+QString::number(tcpClient->peerPort()));
     //qDebug()<<tcpClient->peerPort();
 
     ui->actConnect->setEnabled(false);
@@ -67,7 +67,7 @@ void MainWindow::onConnected()
 
 void MainWindow::onDisconnected()
 {
-    ui->plainTextEditLocalHistory->appendPlainText("->已与服务器断开连接");
+    ui->plainTextEditLocalHistory->appendPlainText("[Message]已与服务器断开连接");
 
     ui->actConnect->setEnabled(true);
     ui->actDisconnect->setEnabled(false);
@@ -96,10 +96,11 @@ void MainWindow::onSocketStateChange(QAbstractSocket::SocketState socketState)
 
 void MainWindow::onSocketReadyRead()
 {
-    while(tcpClient->canReadLine())
-    {
-        ui->plainTextEditLocalHistory->appendPlainText("[in]"+tcpClient->readLine());
-    }
+//    while(tcpClient->canReadLine())
+//    {
+//        ui->plainTextEditLocalHistory->appendPlainText("[in]"+tcpClient->readLine().toHex().toUpper());
+//    }
+    ui->plainTextEditLocalHistory->appendPlainText("[in]"+tcpClient->readAll().toHex().toUpper());
 }
 
 void MainWindow::on_actConnect_triggered()
@@ -119,17 +120,19 @@ void MainWindow::on_actDisconnect_triggered()
 
 void MainWindow::on_actSend_triggered()
 {
-    QString msg = ui->lineEditCommand->text();
-    QByteArray msgToSend;
+    if(tcpClient->state() == QAbstractSocket::ConnectedState)
+    {
+        QString msg = ui->lineEditCommand->text();
+        QByteArray msgToSend;
 
-    ConvertStringToHex(msg,msgToSend);
-    ui->plainTextEditLocalHistory->appendPlainText("[out]"+msg);
-    //ui->lineEditMsg->clear();
-    ui->lineEditCommand->setFocus();
-    ui->plainTextEditLocalHistory->appendPlainText("[out]"+msgToSend);
-
-
-    tcpClient->write(msgToSend);
+        ConvertStringToHex(msg,msgToSend);
+        ui->plainTextEditLocalHistory->appendPlainText("[out]"+msgToSend.toHex().toUpper());
+        //ui->lineEditMsg->clear();
+        ui->lineEditCommand->setFocus();
+        tcpClient->write(msgToSend);
+    }
+    else
+        ui->plainTextEditLocalHistory->appendPlainText("[Warning] Connection has been lost");
 }
 
 void MainWindow::on_actQuit_triggered()
