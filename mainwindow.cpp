@@ -219,10 +219,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                 case Qt::Key_S: {qDebug("down");ctrlCommand[5] = 0x07;ctrlCommand[6] = 0x94;ctrlCommand[7] = 0xED;tcpClient->write(ctrlCommand);break;}
                 case Qt::Key_A: {qDebug("left");ctrlCommand[5] = 0x04;ctrlCommand[6] = 0x95;ctrlCommand[7] = 0xAD;tcpClient->write(ctrlCommand);break;}
                 case Qt::Key_D: {qDebug("right");ctrlCommand[5] = 0x05;ctrlCommand[6] = 0x55;ctrlCommand[7] = 0x6C;tcpClient->write(ctrlCommand);break;}
-                case Qt::Key_5: qDebug("up");break;
-                case Qt::Key_2: qDebug("down");break;
-                case Qt::Key_1: qDebug("left");break;
-                case Qt::Key_3: qDebug("right");break;
+                case Qt::Key_5: {qDebug("up");ctrlCommand[5] = 0x02;ctrlCommand[6] = 0x97;ctrlCommand[7] = 0x2D;tcpClient->write(ctrlCommand);break;}
+                case Qt::Key_2: {qDebug("down");ctrlCommand[5] = 0x07;ctrlCommand[6] = 0x94;ctrlCommand[7] = 0xED;tcpClient->write(ctrlCommand);break;}
+                case Qt::Key_1: {qDebug("left");ctrlCommand[5] = 0x04;ctrlCommand[6] = 0x95;ctrlCommand[7] = 0xAD;tcpClient->write(ctrlCommand);break;}
+                case Qt::Key_3: {qDebug("right");ctrlCommand[5] = 0x05;ctrlCommand[6] = 0x55;ctrlCommand[7] = 0x6C;tcpClient->write(ctrlCommand);break;}
                 default: break;
             }
         }
