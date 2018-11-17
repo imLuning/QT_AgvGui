@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     tcpClient = new QTcpSocket(this);   //创建socket
-    labSocketState  = new QLabel("socket状态：");  //添加状态栏信息
+    labSocketState  = new QLabel("socket state：");  //添加状态栏信息
     labSocketState->setMinimumWidth(300);
     ui->statusBar->addWidget(labSocketState);
     QString localIP = getLocalIP(); //获取本地IP
@@ -99,6 +99,8 @@ void MainWindow::onSocketStateChange(QAbstractSocket::SocketState socketState)
             {labSocketState->setText("socket state：ClosingState");break;}
         case QAbstractSocket::ListeningState:
             {labSocketState->setText("socket state：ListeningState");break;}
+        default:
+            break;
     }
 }
 
@@ -192,5 +194,39 @@ void MainWindow::on_btnSetCommand_clicked()
             break;
         default:
             break;
+    }
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    QByteArray ctrlCommand;
+    ctrlCommand.resize(8);
+    ctrlCommand[0] = 0x55;
+    ctrlCommand[1] = 0x55;
+    ctrlCommand[2] = 0x03;
+    ctrlCommand[3] = 0x02;
+    ctrlCommand[4] = 0x10;
+    if(ui->checkBoxRemoteState->isChecked())
+    {
+        ui->checkBoxRemoteState->setFocus();
+        static uint32_t cnt = 0;
+        cnt++;
+        if((cnt%5 == 0)&&(tcpClient->state() == QAbstractSocket::ConnectedState))
+        {
+            switch(event->key())
+            {
+                case Qt::Key_W: {qDebug("up");ctrlCommand[5] = 0x02;ctrlCommand[6] = 0x97;ctrlCommand[7] = 0x2D;tcpClient->write(ctrlCommand);break;}
+                case Qt::Key_S: {qDebug("down");ctrlCommand[5] = 0x07;ctrlCommand[6] = 0x94;ctrlCommand[7] = 0xED;tcpClient->write(ctrlCommand);break;}
+                case Qt::Key_A: {qDebug("left");ctrlCommand[5] = 0x04;ctrlCommand[6] = 0x95;ctrlCommand[7] = 0xAD;tcpClient->write(ctrlCommand);break;}
+                case Qt::Key_D: {qDebug("right");ctrlCommand[5] = 0x05;ctrlCommand[6] = 0x55;ctrlCommand[7] = 0x6C;tcpClient->write(ctrlCommand);break;}
+                case Qt::Key_5: qDebug("up");break;
+                case Qt::Key_2: qDebug("down");break;
+                case Qt::Key_1: qDebug("left");break;
+                case Qt::Key_3: qDebug("right");break;
+                default: break;
+            }
+        }
+        if(cnt>=9999)
+            cnt = 0;
     }
 }
